@@ -223,6 +223,7 @@ textarea.fc{resize:vertical;min-height:70px;}
   <div class="tb"><div class="tl"><a href="/new-program-page" class="btn btn-g"><i class="fa fa-plus"></i> New Program</a></div><div class="tg-wrap"><label class="tg"><input type="checkbox" id="vt"><span class="tk"></span></label> Table View</div></div>
   <div id="tv" class="card"><div class="tw"><table class="ss-tbl"><thead><tr><th>Program Name</th><th class="hm">Description</th><th>Date</th><th>Action</th></tr></thead><tbody id="pt"></tbody></table></div><div class="pag" id="pg"></div></div>
   <div id="cv" class="ig" style="display:none"></div>
+  <div class="pag" id="cpg" style="display:none"></div>
 </div></main>
 <footer class="ss-foot">© 2026 Samarpan Setu | Powered By KREYA IT CONSULTING LTD | 9582388885 | All Rights Reserved.</footer>
 <script>
@@ -230,19 +231,57 @@ function ddToggle(e){e.preventDefault();document.getElementById('ddNav').classLi
 document.addEventListener('click',e=>{if(!e.target.closest('.nr'))document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));});
 </script>
 <script>
-let pd=[],tp=1;
+let pd=[],tp=1,cp=1;
+const vt=document.getElementById('vt'),tv=document.getElementById('tv'),cv=document.getElementById('cv'),pgEl=document.getElementById('pg'),cpgEl=document.getElementById('cpg');
+
 function fmtD(s){if(!s)return'';const d=new Date(s);return`${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;}
 function editP(id){window.location.href=`/edit-program-page?id=${id}`;}
+
 function render(){
-  document.getElementById('pt').innerHTML=pd.map(p=>`<tr><td>${p.program_name}</td><td class="hm">${p.description||''}</td><td>${fmtD(p.program_date)}</td><td><button class="btn btn-o btn-sm" onclick="editP(${p.id})"><i class="fa fa-pen"></i> Edit</button></td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No programs found</td></tr>';
-  document.getElementById('cv').innerHTML=pd.map(p=>`<div class="ic"><h5>${p.program_name}</h5><div class="sub">${fmtD(p.program_date)}</div><p>${p.description||''}</p><div class="cf"><button class="btn btn-o btn-sm" onclick="editP(${p.id})"><i class="fa fa-pen"></i> Edit</button></div></div>`).join('')||'<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No programs found</div>';
+  document.getElementById('pt').innerHTML=pd.map(p=>`<tr>
+    <td>${p.program_name}</td>
+    <td class="hm">${p.description||''}</td>
+    <td>${fmtD(p.program_date)}</td>
+    <td><button class="btn btn-o btn-sm" onclick="editP(${p.id})"><i class="fa fa-pen"></i> Edit</button></td>
+  </tr>`).join('')||'<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">No programs found</td></tr>';
+  cv.innerHTML=pd.map(p=>`<div class="ic">
+    <h5>${p.program_name}</h5>
+    <div class="sub">${fmtD(p.program_date)}</div>
+    <p>${p.description||''}</p>
+    <div class="cf"><button class="btn btn-o btn-sm" onclick="editP(${p.id})"><i class="fa fa-pen"></i> Edit</button></div>
+  </div>`).join('')||'<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No programs found</div>';
 }
-function renderPag(cur){document.getElementById('pg').innerHTML=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cur?'on':''}" onclick="fetchP(${i+1})">${i+1}</button>`).join('');}
-function fetchP(p=1){fetch(`/programs?page=${p}`).then(r=>r.json()).then(res=>{pd=res.data;tp=res.totalPages;render();renderPag(p);});}
-const vt=document.getElementById('vt'),tv=document.getElementById('tv'),cv=document.getElementById('cv');
-vt.addEventListener('change',()=>{tv.style.display=vt.checked?'block':'none';cv.style.display=vt.checked?'none':'grid';});
-function setView(){if(window.innerWidth<768){vt.checked=false;tv.style.display='none';cv.style.display='grid';}else{vt.checked=true;tv.style.display='block';cv.style.display='none';}}
-window.addEventListener('resize',setView);setView();fetchP();
+
+function renderPag(){
+  const btns=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cp?'on':''}" onclick="fetchP(${i+1})">${i+1}</button>`).join('');
+  pgEl.innerHTML=btns;
+  cpgEl.innerHTML=btns;
+  cpgEl.style.display = !vt.checked ? 'flex' : 'none';
+}
+
+function fetchP(p=1){
+  cp=p;
+  fetch(`/programs?page=${p}`).then(r=>r.json()).then(res=>{pd=res.data;tp=res.totalPages;render();renderPag();});
+}
+
+vt.addEventListener('change',()=>{
+  tv.style.display=vt.checked?'block':'none';
+  cv.style.display=vt.checked?'none':'grid';
+  cpgEl.style.display=vt.checked?'none':'flex';
+});
+
+function setView(){
+  if(window.innerWidth<768){
+    vt.checked=false;tv.style.display='none';cv.style.display='grid';
+    cpgEl.style.display=tp>1?'flex':'none';
+  } else {
+    vt.checked=true;tv.style.display='block';cv.style.display='none';
+    cpgEl.style.display='none';
+  }
+}
+window.addEventListener('resize',setView);
+setView();
+fetchP();
 </script>
 </body>
 </html>
