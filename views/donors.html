@@ -229,6 +229,7 @@ textarea.fc{resize:vertical;min-height:70px;}
   </div>
   <div id="tv" class="card"><div class="tw"><table class="ss-tbl"><thead><tr><th>Donor ID</th><th>Name</th><th>Email</th><th>Mobile</th><th class="hm">City</th><th class="hm">State</th><th>Action</th></tr></thead><tbody id="dt"></tbody></table></div><div class="pag" id="pg"></div></div>
   <div id="cv" class="ig" style="display:none"></div>
+  <div class="pag" id="cpg" style="display:none"></div>
 </div></main>
 <footer class="ss-foot">© 2026 Samarpan Setu | Powered By KREYA IT CONSULTING LTD | 9582388885 | All Rights Reserved.</footer>
 <script>
@@ -236,23 +237,74 @@ function ddToggle(e){e.preventDefault();document.getElementById('ddNav').classLi
 document.addEventListener('click',e=>{if(!e.target.closest('.nr'))document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));});
 </script>
 <script>
-let dd=[],tp=1,cs='';
-const dt=document.getElementById('dt'),cv=document.getElementById('cv'),tv=document.getElementById('tv'),vt=document.getElementById('vt');
+let dd=[],tp=1,cs='',cp=1;
+const dt=document.getElementById('dt'),cv=document.getElementById('cv'),tv=document.getElementById('tv'),vt=document.getElementById('vt'),pgEl=document.getElementById('pg'),cpgEl=document.getElementById('cpg');
+
 async function fetchDonors(p=1){
+  cp=p;
   const r=await fetch(`/donors?page=${p}&search=${cs}`);
-  const res=await r.json();dd=res.data||[];tp=res.totalPages||1;render();renderPag(p);
+  const res=await r.json();
+  dd=res.data||[];tp=res.totalPages||1;
+  render();renderPag();
 }
 function searchDonors(){cs=document.getElementById('si').value.trim();fetchDonors(1);}
 document.getElementById('si').addEventListener('keydown',e=>{if(e.key==='Enter')searchDonors();});
+
 function render(){
-  if(!dd.length){dt.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No donors found</td></tr>';cv.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No donors found</div>';return;}
-  dt.innerHTML=dd.map(d=>`<tr><td>${d.donor_id}</td><td>${d.first_name} ${d.last_name}</td><td>${d.email||'-'}</td><td>${d.mobile||'-'}</td><td class="hm">${d.city||'-'}</td><td class="hm">${d.state||'-'}</td><td><a href="/edit-donor-page/${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></td></tr>`).join('');
-  cv.innerHTML=dd.map(d=>`<div class="ic"><h5>${d.first_name} ${d.last_name}</h5><div class="sub">${d.donor_id}</div><p><b>Mobile:</b> ${d.mobile||'-'}</p><p><b>Email:</b> ${d.email||'-'}</p><p><b>City:</b> ${d.city||'-'}, ${d.state||'-'}</p><div class="cf"><a href="/edit-donor-page/${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></div></div>`).join('');
+  if(!dd.length){
+    dt.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No donors found</td></tr>';
+    cv.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No donors found</div>';
+    return;
+  }
+  dt.innerHTML=dd.map(d=>`<tr>
+    <td>${d.donor_id}</td>
+    <td>${d.first_name} ${d.last_name}</td>
+    <td>${d.email||'-'}</td>
+    <td>${d.mobile||'-'}</td>
+    <td class="hm">${d.city||'-'}</td>
+    <td class="hm">${d.state||'-'}</td>
+    <td><a href="/edit-donor-page/${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></td>
+  </tr>`).join('');
+  cv.innerHTML=dd.map(d=>`<div class="ic">
+    <h5>${d.first_name} ${d.last_name}</h5>
+    <div class="sub">${d.donor_id}</div>
+    <p><b>Mobile:</b> ${d.mobile||'-'}</p>
+    <p><b>Email:</b> ${d.email||'-'}</p>
+    <p><b>City:</b> ${d.city||'-'}, ${d.state||'-'}</p>
+    <div class="cf"><a href="/edit-donor-page/${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></div>
+  </div>`).join('');
 }
-function renderPag(cur){document.getElementById('pg').innerHTML=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cur?'on':''}" onclick="fetchDonors(${i+1})">${i+1}</button>`).join('');}
-vt.addEventListener('change',()=>{tv.style.display=vt.checked?'block':'none';cv.style.display=vt.checked?'none':'grid';});
-function setView(){if(window.innerWidth<768){vt.checked=false;tv.style.display='none';cv.style.display='grid';}else{vt.checked=true;tv.style.display='block';cv.style.display='none';}}
-window.addEventListener('resize',setView);setView();fetchDonors();
+
+function renderPag(){
+  const btns=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cp?'on':''}" onclick="fetchDonors(${i+1})">${i+1}</button>`).join('');
+  pgEl.innerHTML=btns;
+  cpgEl.innerHTML=btns.replace(/fetchDonors/g,'fetchDonors'); // same function, both paginations call same fetch
+  // Show/hide card pagination based on current view
+  cpgEl.style.display = !vt.checked ? 'flex' : 'none';
+}
+
+vt.addEventListener('change',()=>{
+  tv.style.display=vt.checked?'block':'none';
+  cv.style.display=vt.checked?'none':'grid';
+  cpgEl.style.display=vt.checked?'none':'flex';
+});
+
+function setView(){
+  if(window.innerWidth<768){
+    vt.checked=false;
+    tv.style.display='none';
+    cv.style.display='grid';
+    cpgEl.style.display=tp>1?'flex':'none';
+  } else {
+    vt.checked=true;
+    tv.style.display='block';
+    cv.style.display='none';
+    cpgEl.style.display='none';
+  }
+}
+window.addEventListener('resize',setView);
+setView();
+fetchDonors();
 </script>
 </body>
 </html>
