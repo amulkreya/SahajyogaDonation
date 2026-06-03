@@ -230,6 +230,7 @@ textarea.fc{resize:vertical;min-height:70px;}
   </div>
   <div id="tv" class="card"><div class="tw"><table class="ss-tbl"><thead><tr><th>Receipt</th><th>Donor</th><th class="hm">Program</th><th>Amount</th><th class="hm">Date</th><th class="hm">Mode</th><th>Actions</th></tr></thead><tbody id="dt"></tbody></table></div><div class="pag" id="pg"></div></div>
   <div id="cv" class="ig" style="display:none"></div>
+  <div class="pag" id="cpg" style="display:none"></div>
 </div></main>
 <footer class="ss-foot">© 2026 Samarpan Setu | Powered By KREYA IT CONSULTING LTD | 9582388885 | All Rights Reserved.</footer>
 <script>
@@ -237,21 +238,73 @@ function ddToggle(e){e.preventDefault();document.getElementById('ddNav').classLi
 document.addEventListener('click',e=>{if(!e.target.closest('.nr'))document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));});
 </script>
 <script>
-let dd=[];
-const dt=document.getElementById('dt'),cv=document.getElementById('cv'),yf=document.getElementById('yf'),tv=document.getElementById('tv'),vt=document.getElementById('vt');
+let dd=[],cp=1;
+const dt=document.getElementById('dt'),cv=document.getElementById('cv'),yf=document.getElementById('yf'),tv=document.getElementById('tv'),vt=document.getElementById('vt'),pgEl=document.getElementById('pg'),cpgEl=document.getElementById('cpg');
+
 function fmtD(s){const d=new Date(s);return`${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;}
 function bc(m){return{Cash:'b-cash',UPI:'b-upi',NEFT:'b-neft'}[m]||'b-cash';}
+
 function render(){
-  dt.innerHTML=dd.map(d=>`<tr><td><strong>${d.receipt_number||''}</strong></td><td>${d.first_name} ${d.last_name}</td><td class="hm">${d.program_name||'-'}</td><td>₹${parseFloat(d.donation_amount).toLocaleString('en-IN')}</td><td class="hm">${fmtD(d.donation_date)}</td><td class="hm"><span class="badge ${bc(d.payment_mode)}">${d.payment_mode}</span></td><td style="display:flex;gap:.3rem;flex-wrap:wrap"><a href="/edit-donation-page?id=${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i></a><a href="/receipt-pdf/${d.receipt_number}/${d.mobile}" target="_blank" class="btn btn-g btn-sm"><i class="fa fa-file-pdf"></i> PDF</a></td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No donations found</td></tr>';
-  cv.innerHTML=dd.map(d=>`<div class="ic"><div class="sub"><i class="fa fa-receipt"></i> ${d.receipt_number||''}</div><h5>${d.first_name} ${d.last_name}</h5><p><b>Amount:</b> ₹${parseFloat(d.donation_amount).toLocaleString('en-IN')}</p><p><b>Program:</b> ${d.program_name||'-'}</p><p><b>Date:</b> ${fmtD(d.donation_date)}</p><p><b>Mode:</b> <span class="badge ${bc(d.payment_mode)}">${d.payment_mode}</span></p><div class="cf"><a href="/edit-donation-page?id=${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a><a href="/receipt-pdf/${d.receipt_number}/${d.mobile}" target="_blank" class="btn btn-g btn-sm"><i class="fa fa-file-pdf"></i> PDF</a></div></div>`).join('')||'<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No donations found</div>';
+  dt.innerHTML=dd.map(d=>`<tr>
+    <td><strong>${d.receipt_number||''}</strong></td>
+    <td>${d.first_name} ${d.last_name}</td>
+    <td class="hm">${d.program_name||'-'}</td>
+    <td>₹${parseFloat(d.donation_amount).toLocaleString('en-IN')}</td>
+    <td class="hm">${fmtD(d.donation_date)}</td>
+    <td class="hm"><span class="badge ${bc(d.payment_mode)}">${d.payment_mode}</span></td>
+    <td style="display:flex;gap:.3rem;flex-wrap:wrap">
+      <a href="/edit-donation-page?id=${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i></a>
+      <a href="/receipt-pdf/${d.receipt_number}/${d.mobile}" target="_blank" class="btn btn-g btn-sm"><i class="fa fa-file-pdf"></i> PDF</a>
+    </td>
+  </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No donations found</td></tr>';
+  cv.innerHTML=dd.map(d=>`<div class="ic">
+    <div class="sub"><i class="fa fa-receipt"></i> ${d.receipt_number||''}</div>
+    <h5>${d.first_name} ${d.last_name}</h5>
+    <p><b>Amount:</b> ₹${parseFloat(d.donation_amount).toLocaleString('en-IN')}</p>
+    <p><b>Program:</b> ${d.program_name||'-'}</p>
+    <p><b>Date:</b> ${fmtD(d.donation_date)}</p>
+    <p><b>Mode:</b> <span class="badge ${bc(d.payment_mode)}">${d.payment_mode}</span></p>
+    <div class="cf">
+      <a href="/edit-donation-page?id=${d.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a>
+      <a href="/receipt-pdf/${d.receipt_number}/${d.mobile}" target="_blank" class="btn btn-g btn-sm"><i class="fa fa-file-pdf"></i> PDF</a>
+    </div>
+  </div>`).join('')||'<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No donations found</div>';
 }
-function renderPag(tp,cur){document.getElementById('pg').innerHTML=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cur?'on':''}" onclick="fetchD('${yf.value}',${i+1})">${i+1}</button>`).join('');}
-function fetchD(y='',p=1){let url=`/donations-list?page=${p}`;if(y)url+=`&year=${y}`;fetch(url).then(r=>r.json()).then(res=>{dd=res.data;render();renderPag(res.totalPages,res.page);});}
+
+function renderPag(tp,cur){
+  const btns=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cur?'on':''}" onclick="fetchD('${yf.value}',${i+1})">${i+1}</button>`).join('');
+  pgEl.innerHTML=btns;
+  cpgEl.innerHTML=btns;
+  cpgEl.style.display = !vt.checked ? 'flex' : 'none';
+}
+
+function fetchD(y='',p=1){
+  cp=p;
+  let url=`/donations-list?page=${p}`;if(y)url+=`&year=${y}`;
+  fetch(url).then(r=>r.json()).then(res=>{dd=res.data;render();renderPag(res.totalPages,res.page);});
+}
+
 yf.addEventListener('change',()=>fetchD(yf.value,1));
 document.getElementById('expBtn').addEventListener('click',()=>{let y=yf.value;window.location.href='/donations-export'+(y?`?year=${y}`:'');});
-vt.addEventListener('change',()=>{tv.style.display=vt.checked?'block':'none';cv.style.display=vt.checked?'none':'grid';});
-function setView(){if(window.innerWidth<768){vt.checked=false;tv.style.display='none';cv.style.display='grid';}else{vt.checked=true;tv.style.display='block';cv.style.display='none';}}
-window.addEventListener('resize',setView);setView();fetchD();
+
+vt.addEventListener('change',()=>{
+  tv.style.display=vt.checked?'block':'none';
+  cv.style.display=vt.checked?'none':'grid';
+  cpgEl.style.display=vt.checked?'none':'flex';
+});
+
+function setView(){
+  if(window.innerWidth<768){
+    vt.checked=false;tv.style.display='none';cv.style.display='grid';
+    cpgEl.style.display='flex';
+  } else {
+    vt.checked=true;tv.style.display='block';cv.style.display='none';
+    cpgEl.style.display='none';
+  }
+}
+window.addEventListener('resize',setView);
+setView();
+fetchD();
 </script>
 </body>
 </html>
