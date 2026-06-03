@@ -1,203 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — Samarpan Setu</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-.stat-card {
-  border-radius: 16px;
-  transition: 0.3s;
+:root{
+  --brand:#F32B56;--brand-d:#c41e43;--brand-l:#fff0f3;
+  --dark:#16213e;--surface:#fff;--bg:#f5f6fa;
+  --border:#e4e6ef;--text:#1e1e2d;--muted:#6c7293;
+  --green:#12b76a;--orange:#f79009;--blue:#0ea5e9;--purple:#7c3aed;--teal:#0d9488;
+  --r:14px;--r-sm:8px;--r-xs:6px;
 }
-.stat-card:hover {
-  transform: translateY(-5px);
-}
-@media(max-width: 576px){
-  .stat-card { margin-bottom: 1rem; }
-}
-.custom-footer {
-  background-color: #F32B56;
-}
-.custom-navbar {
-  background-color: #F32B56;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+.ss-nav{background:var(--brand);height:58px;display:flex;align-items:center;padding:0 1rem;position:sticky;top:0;z-index:1000;box-shadow:0 2px 12px rgba(243,43,86,.28);}
+.ss-nav .logo{font-family:'Poppins',sans-serif;font-weight:700;font-size:1rem;color:#fff;text-decoration:none;display:flex;align-items:center;gap:.55rem;flex-shrink:0;}
+.ss-nav .logo img{width:32px;height:32px;border-radius:50%;object-fit:cover;}
+.ss-nav .nr{margin-left:auto;position:relative;}
+.wb{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:999px;padding:.28rem .8rem;font-size:.8rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem;font-family:'DM Sans',sans-serif;}
+.wb:hover{background:rgba(255,255,255,.28);}
+.dd-menu{position:absolute;right:0;top:calc(100% + 8px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);box-shadow:0 8px 24px rgba(0,0,0,.13);min-width:176px;z-index:9999;display:none;overflow:hidden;}
+.dd-menu.open{display:block;}
+.dd-menu a{display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;font-size:.84rem;color:var(--text);text-decoration:none;transition:background .15s;}
+.dd-menu a:hover{background:var(--bg);}
+.dd-menu a.red{color:var(--brand);}
+.dd-div{border-top:1px solid var(--border);margin:.2rem 0;}
+
+/* TABS */
+.ss-tabs{background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.ss-tabs::-webkit-scrollbar{display:none;}
+.ss-tabs ul{display:flex;list-style:none;padding:0 1rem;margin:0;white-space:nowrap;}
+.ss-tabs a{display:inline-flex;align-items:center;gap:.35rem;padding:.65rem .9rem;font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .18s,border-color .18s;}
+.ss-tabs a:hover{color:var(--brand);}
+.ss-tabs a.on{color:var(--brand);border-bottom-color:var(--brand);}
+
+/* LAYOUT */
+main{flex:1;padding:1.1rem;}
+.ctr{max-width:1200px;margin:0 auto;}
+.fctr{max-width:640px;margin:0 auto;}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;}
+.card-head{background:var(--brand);color:#fff;padding:.9rem 1.2rem;font-family:'Poppins',sans-serif;font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.45rem;}
+.card-body{padding:1.3rem;}
+
+/* STAT CARDS */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.9rem;margin-bottom:1.2rem;}
+.sc{border-radius:var(--r);padding:1.1rem 1.2rem;color:#fff;position:relative;overflow:hidden;border:none;}
+.sc::after{content:'';position:absolute;right:-18px;bottom:-18px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.1);}
+.sc .si{font-size:1.4rem;margin-bottom:.4rem;opacity:.85;}
+.sc .sl{font-size:.7rem;font-weight:500;opacity:.85;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.18rem;}
+.sc .sv{font-family:'Poppins',sans-serif;font-size:1.55rem;font-weight:700;line-height:1;}
+.sc .ss{font-size:.68rem;opacity:.72;margin-top:.25rem;}
+.c-red{background:linear-gradient(135deg,#F32B56,#b5173a);}
+.c-grn{background:linear-gradient(135deg,#12b76a,#0a8f52);}
+.c-blu{background:linear-gradient(135deg,#0ea5e9,#0369a1);}
+.c-org{background:linear-gradient(135deg,#f79009,#b45309);}
+.c-pur{background:linear-gradient(135deg,#7c3aed,#5b21b6);}
+.c-tel{background:linear-gradient(135deg,#0d9488,#0f766e);}
+
+/* AMT CARDS */
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.9rem;margin-bottom:1.2rem;}
+.ac{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1.2rem;}
+.ac .al{font-size:.76rem;color:var(--muted);font-weight:500;margin-bottom:.35rem;display:flex;align-items:center;gap:.35rem;}
+.ac .av{font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:700;}
+.ac .av span{font-size:.9rem;color:var(--muted);font-weight:400;}
+.chip{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.18rem .6rem;font-size:.7rem;font-weight:600;margin-top:.4rem;}
+.chip-g{background:#dcfce7;color:#166534;}
+.chip-r{background:#fee2e2;color:#991b1b;}
+
+/* QUICK ACTIONS */
+.qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin-bottom:1.2rem;}
+.qa-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:.9rem .75rem;text-align:center;text-decoration:none;color:var(--text);transition:all .18s;display:block;}
+.qa-btn:hover{border-color:var(--brand);background:var(--brand-l);transform:translateY(-2px);box-shadow:0 4px 14px rgba(243,43,86,.13);}
+.qa-btn .qi{font-size:1.3rem;margin-bottom:.4rem;display:block;}
+.qa-btn .ql{font-size:.76rem;font-weight:500;}
+
+/* PROGRESS */
+.prog-box{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1.2rem;margin-bottom:1.2rem;}
+.pi{margin-bottom:.85rem;}
+.pi:last-child{margin-bottom:0;}
+.pr{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.35rem;color:var(--muted);}
+.pr b{color:var(--text);}
+.pb{height:7px;background:var(--border);border-radius:999px;overflow:hidden;}
+.pf{height:100%;border-radius:999px;transition:width .9s ease;}
+
+/* RECENT */
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:.9rem;margin-bottom:1.2rem;}
+.rc{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;}
+.rc-h{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.1rem;border-bottom:1px solid var(--border);}
+.rc-t{font-family:'Poppins',sans-serif;font-size:.88rem;font-weight:600;}
+.rc-l{font-size:.75rem;color:var(--brand);text-decoration:none;}
+
+/* TABLE */
+.tw{overflow-x:auto;}
+.ss-tbl{width:100%;border-collapse:collapse;}
+.ss-tbl thead th{background:var(--brand);color:#fff;padding:.65rem .9rem;font-size:.76rem;font-weight:600;text-align:left;white-space:nowrap;}
+.ss-tbl tbody tr{border-bottom:1px solid var(--border);}
+.ss-tbl tbody tr:hover{background:#fafafa;}
+.ss-tbl tbody td{padding:.62rem .9rem;font-size:.82rem;}
+
+/* ITEM GRID */
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:.9rem;}
+.ic{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:1rem;transition:box-shadow .18s;}
+.ic:hover{box-shadow:0 4px 16px rgba(0,0,0,.07);}
+.ic h5{font-family:'Poppins',sans-serif;font-size:.9rem;font-weight:600;margin-bottom:.4rem;}
+.ic .sub{font-size:.72rem;color:var(--muted);margin-bottom:.5rem;}
+.ic p{font-size:.79rem;color:var(--muted);margin:.18rem 0;}
+.ic p b{color:var(--text);}
+.ic .cf{display:flex;justify-content:flex-end;gap:.4rem;margin-top:.7rem;flex-wrap:wrap;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.5rem .95rem;border-radius:var(--r-sm);font-size:.84rem;font-weight:500;cursor:pointer;border:none;text-decoration:none;transition:all .18s;font-family:inherit;}
+.btn-p{background:var(--brand);color:#fff;} .btn-p:hover{background:var(--brand-d);color:#fff;}
+.btn-g{background:var(--green);color:#fff;} .btn-g:hover{background:#0da05e;color:#fff;}
+.btn-o{background:var(--orange);color:#fff;} .btn-o:hover{background:#d97706;color:#fff;}
+.btn-s{background:#e8eaf0;color:var(--text);} .btn-s:hover{background:#d4d6df;}
+.btn-out{background:transparent;color:var(--brand);border:1.5px solid var(--brand);} .btn-out:hover{background:var(--brand-l);}
+.btn-b{background:var(--blue);color:#fff;}
+.btn-sm{padding:.28rem .6rem;font-size:.76rem;border-radius:var(--r-xs);}
+.btn-w{width:100%;justify-content:center;}
+
+/* TOOLBAR */
+.tb{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center;margin-bottom:1.1rem;}
+.tb .tl{display:flex;gap:.65rem;flex-wrap:wrap;flex:1;}
+.sb{display:flex;border:1.5px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--surface);}
+.sb input{border:none;padding:.56rem .85rem;font-size:.84rem;font-family:inherit;min-width:0;width:200px;outline:none;color:var(--text);}
+.sb button{background:var(--brand);color:#fff;border:none;padding:.56rem .85rem;cursor:pointer;font-size:.82rem;}
+.sb button:hover{background:var(--brand-d);}
+.sel{padding:.48rem .82rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.84rem;font-family:inherit;background:var(--surface);outline:none;color:var(--text);}
+.sel:focus{border-color:var(--brand);}
+
+/* TOGGLE */
+.tg-wrap{display:flex;align-items:center;gap:.45rem;font-size:.8rem;color:var(--muted);white-space:nowrap;}
+.tg{position:relative;width:36px;height:20px;flex-shrink:0;}
+.tg input{opacity:0;width:0;height:0;}
+.tk{position:absolute;inset:0;background:var(--border);border-radius:999px;cursor:pointer;transition:.2s;}
+.tk::before{content:'';position:absolute;width:14px;height:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.tg input:checked+.tk{background:var(--brand);}
+.tg input:checked+.tk::before{transform:translateX(16px);}
+
+/* FORMS */
+.fg{margin-bottom:.95rem;}
+.fl{font-size:.78rem;font-weight:500;color:var(--muted);display:block;margin-bottom:.32rem;}
+.fl .req{color:var(--brand);}
+.fc,.fs{width:100%;padding:.62rem .88rem;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:.88rem;font-family:inherit;background:var(--surface);color:var(--text);outline:none;transition:border-color .18s,box-shadow .18s;}
+.fc:focus,.fs:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(243,43,86,.11);}
+.fc[readonly]{background:var(--bg);color:var(--muted);}
+.fc.inv{border-color:var(--brand);}
+textarea.fc{resize:vertical;min-height:70px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
+.fa{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:.5rem;}
+.em{font-size:.74rem;color:var(--brand);margin-top:.22rem;display:none;}
+.fc.inv~.em{display:block;}
+
+/* ALERTS */
+.alert{padding:.7rem .95rem;border-radius:var(--r-sm);font-size:.84rem;margin-bottom:.9rem;}
+.alert-i{background:#e0f2fe;color:#0c4a6e;border:1px solid #bae6fd;}
+.alert-s{background:#dcfce7;color:#166534;border:1px solid #bbf7d0;}
+.alert-d{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;}
+.dn{display:none!important;}
+
+/* BADGE */
+.badge{display:inline-block;padding:.18rem .55rem;border-radius:999px;font-size:.68rem;font-weight:600;}
+.b-cash{background:#dcfce7;color:#166534;}
+.b-upi{background:#e0f2fe;color:#0c4a6e;}
+.b-neft{background:#f3e8ff;color:#6b21a8;}
+.b-paid{background:#dcfce7;color:#166534;}
+.b-npaid{background:#fee2e2;color:#991b1b;}
+
+/* PAGINATION */
+.pag{display:flex;gap:.35rem;justify-content:center;flex-wrap:wrap;padding:.9rem;}
+.pg{padding:.32rem .7rem;border-radius:var(--r-xs);border:1.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:.78rem;transition:all .15s;}
+.pg.on,.pg:hover{background:var(--brand);color:#fff;border-color:var(--brand);}
+
+/* SECTION TITLE */
+.st{font-family:'Poppins',sans-serif;font-size:.9rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;color:var(--text);}
+
+/* FOOTER */
+.ss-foot{background:var(--brand);color:rgba(255,255,255,.9);text-align:center;padding:.75rem;font-size:.73rem;}
+
+/* PROFILE */
+.prow{display:flex;gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.prow:last-child{border-bottom:none;}
+.plbl{font-size:.78rem;font-weight:600;color:var(--muted);min-width:160px;padding-top:.1rem;}
+.pval{font-size:.88rem;color:var(--text);word-break:break-word;}
+
+@media(max-width:640px){
+  .sg{grid-template-columns:repeat(2,1fr);}
+  .sc .sv{font-size:1.3rem;}
+  .ag{grid-template-columns:1fr;}
+  .qa-grid{grid-template-columns:repeat(3,1fr);}
+  .fr{grid-template-columns:1fr;}
+  .sb input{width:130px;}
+  .rg{grid-template-columns:1fr;}
+  .hm{display:none!important;}
+  main{padding:.8rem;}
 }
 </style>
 </head>
-
-<body class="d-flex flex-column min-vh-100 bg-light">
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark custom-navbar px-4">
-  <a class="navbar-brand d-flex align-items-center" href="/dashboard">
-    <img src="/images/logo.png" width="40" height="40" class="me-2">
-    Samarpan Setu
-  </a>
-
-  <div class="ms-auto dropdown">
-    <a class="text-white dropdown-toggle text-decoration-none" href="#" data-bs-toggle="dropdown">
-      Welcome
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" href="/profile-page">View Profile</a></li>
-      <li><hr class="dropdown-divider"></li>
-      <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
-    </ul>
+<body>
+<nav class="ss-nav">
+  <a href="/dashboard" class="logo"><img src="/images/logo.png" alt="logo">Samarpan Setu</a>
+  <div class="nr">
+    <a class="wb" href="#" onclick="ddToggle(event)"><i class="fa fa-user-circle"></i> Welcome <i class="fa fa-chevron-down" style="font-size:.6rem"></i></a>
+    <div class="dd-menu" id="ddNav">
+      <a href="/profile-page"><i class="fa fa-id-card fa-fw"></i> View Profile</a>
+      <div class="dd-div"></div>
+      <a href="/logout" class="red"><i class="fa fa-right-from-bracket fa-fw"></i> Logout</a>
+    </div>
   </div>
 </nav>
+<div class="ss-tabs"><ul><li><a href="/dashboard" class="on"><i class="fa fa-gauge-high"></i> Dashboard</a></li><li><a href="/donors-page" class=""><i class="fa fa-users"></i> Donors</a></li><li><a href="/programs-page" class=""><i class="fa fa-calendar-days"></i> Programs</a></li><li><a href="/donations-page" class=""><i class="fa fa-hand-holding-heart"></i> Donations</a></li><li><a href="/expenses-page" class=""><i class="fa fa-receipt"></i> Expenses</a></li></ul></div>
 
-<!-- TOP TABS -->
-<div class="bg-white shadow-sm">
-  <div class="container">
-    <ul class="nav nav-tabs py-2 flex-nowrap overflow-auto">
-      <li class="nav-item">
-        <a class="nav-link active" href="/dashboard">Dashboard</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/donors-page">Donors</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/programs-page">Programs</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/donations-page">Donations</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/expenses-page">Expenses</a>
-      </li>
-    </ul>
+<main><div class="ctr">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.65rem;margin-bottom:1.2rem;">
+    <div style="font-family:'Poppins',sans-serif;font-size:1.15rem;font-weight:700;"><i class="fa fa-gauge-high" style="color:var(--brand);margin-right:.35rem;"></i>Dashboard</div>
+    <select class="sel" id="fyFilter" style="min-width:140px;"></select>
   </div>
-</div>
 
-<!-- MAIN CONTENT -->
-<main class="flex-fill">
-<div class="container my-4">
+  <!-- 6 STAT CARDS -->
+  <div class="sg">
+    <div class="sc c-red"><div class="si"><i class="fa fa-users"></i></div><div class="sl">Total Donors</div><div class="sv" id="totalDonors">--</div><div class="ss">All registered</div></div>
+    <div class="sc c-blu"><div class="si"><i class="fa fa-calendar-days"></i></div><div class="sl">Programs</div><div class="sv" id="totalPrograms">--</div><div class="ss">Active programs</div></div>
+    <div class="sc c-grn"><div class="si"><i class="fa fa-hand-holding-heart"></i></div><div class="sl">Donations (FY)</div><div class="sv" id="totalDonations">--</div><div class="ss">This financial year</div></div>
+    <div class="sc c-org"><div class="si"><i class="fa fa-receipt"></i></div><div class="sl">Expenses</div><div class="sv" id="totalExpenses">--</div><div class="ss">All recorded</div></div>
+    <div class="sc c-pur"><div class="si"><i class="fa fa-indian-rupee-sign"></i></div><div class="sl">Donation Amt</div><div class="sv" id="sDonAmt">--</div><div class="ss">Collected (FY)</div></div>
+    <div class="sc c-tel"><div class="si"><i class="fa fa-arrow-trend-down"></i></div><div class="sl">Expense Amt</div><div class="sv" id="sExpAmt">--</div><div class="ss">Spent (FY)</div></div>
+  </div>
 
-<!-- Header + FY Filter -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h4 class="mb-0">Dashboard Overview</h4>
-  <select id="fyFilter" class="form-select w-auto"></select>
-</div>
+  <!-- 3 AMOUNT CARDS -->
+  <div class="ag">
+    <div class="ac"><div class="al"><i class="fa fa-circle-arrow-up" style="color:var(--green)"></i> Total Donation Amount (FY)</div><div class="av"><span>₹</span> <span id="totalDonationAmount">--</span></div><span class="chip chip-g"><i class="fa fa-arrow-up"></i> Collected</span></div>
+    <div class="ac"><div class="al"><i class="fa fa-circle-arrow-down" style="color:var(--brand)"></i> Total Expense Amount (FY)</div><div class="av"><span>₹</span> <span id="totalExpenseAmount">--</span></div><span class="chip chip-r"><i class="fa fa-arrow-down"></i> Spent</span></div>
+    <div class="ac"><div class="al"><i class="fa fa-scale-balanced" style="color:var(--blue)"></i> Net Balance (FY)</div><div class="av"><span>₹</span> <span id="netBal">--</span></div><span class="chip chip-g" id="balChip">Surplus</span></div>
+  </div>
 
-<!-- STAT CARDS -->
-<div class="row g-3">
+  <!-- QUICK ACTIONS -->
+  <div class="st"><i class="fa fa-bolt" style="color:var(--orange)"></i> Quick Actions</div>
+  <div class="qa-grid">
+    <a href="/new-donor-page" class="qa-btn"><span class="qi">👤</span><span class="ql">New Donor</span></a>
+    <a href="/new-donation-page" class="qa-btn"><span class="qi">💸</span><span class="ql">New Donation</span></a>
+    <a href="/new-program-page" class="qa-btn"><span class="qi">📅</span><span class="ql">New Program</span></a>
+    <a href="/new-expense-page" class="qa-btn"><span class="qi">🧾</span><span class="ql">New Expense</span></a>
+    <a href="/donations-export" class="qa-btn"><span class="qi">📥</span><span class="ql">Export CSV</span></a>
+    <a href="/receipt-verify" class="qa-btn"><span class="qi">🔍</span><span class="ql">Verify Receipt</span></a>
+    <a href="/donors-page" class="qa-btn"><span class="qi">📋</span><span class="ql">All Donors</span></a>
+    <a href="/programs-page" class="qa-btn"><span class="qi">🗂️</span><span class="ql">All Programs</span></a>
+  </div>
 
-  <div class="col-md-3">
-    <div class="card stat-card shadow-sm bg-primary text-white">
-      <div class="card-body">
-        <div>Total Donors</div>
-        <h3 id="totalDonors">--</h3>
-      </div>
+  <!-- FUND UTILISATION -->
+  <div class="st"><i class="fa fa-chart-bar" style="color:var(--brand)"></i> Fund Utilisation</div>
+  <div class="prog-box">
+    <div class="pi"><div class="pr"><b>Expense vs Donation</b><span id="utilPct">--</span></div><div class="pb"><div class="pf" id="utilBar" style="background:var(--brand);width:0%"></div></div></div>
+    <div class="pi"><div class="pr"><b>Donor Growth</b><span id="donorPct">--</span></div><div class="pb"><div class="pf" id="donorBar" style="background:var(--green);width:0%"></div></div></div>
+    <div class="pi"><div class="pr"><b>Programs vs Donations</b><span id="progPct">--</span></div><div class="pb"><div class="pf" id="progBar" style="background:var(--blue);width:0%"></div></div></div>
+  </div>
+
+  <!-- RECENT TWO COLUMNS -->
+  <div class="rg">
+    <div class="rc">
+      <div class="rc-h"><span class="rc-t"><i class="fa fa-hand-holding-heart" style="color:var(--brand);margin-right:.3rem"></i>Recent Donations</span><a href="/donations-page" class="rc-l">View all →</a></div>
+      <div class="tw"><table class="ss-tbl"><thead><tr><th>Donor</th><th>Amount</th><th>Mode</th></tr></thead><tbody id="recDon"><tr><td colspan="3" style="text-align:center;padding:1.2rem;color:var(--muted)">Loading…</td></tr></tbody></table></div>
+    </div>
+    <div class="rc">
+      <div class="rc-h"><span class="rc-t"><i class="fa fa-receipt" style="color:var(--orange);margin-right:.3rem"></i>Recent Expenses</span><a href="/expenses-page" class="rc-l">View all →</a></div>
+      <div class="tw"><table class="ss-tbl"><thead><tr><th>Program</th><th>Amount</th><th>Status</th></tr></thead><tbody id="recExp"><tr><td colspan="3" style="text-align:center;padding:1.2rem;color:var(--muted)">Loading…</td></tr></tbody></table></div>
     </div>
   </div>
 
-  <div class="col-md-3">
-    <div class="card stat-card shadow-sm bg-success text-white">
-      <div class="card-body">
-        <div>Total Programs</div>
-        <h3 id="totalPrograms">--</h3>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3">
-    <div class="card stat-card shadow-sm bg-warning text-dark">
-      <div class="card-body">
-        <div>Total Donations (FY)</div>
-        <h3 id="totalDonations">--</h3>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-3">
-    <div class="card stat-card shadow-sm bg-danger text-white">
-      <div class="card-body">
-        <div>Total Expenses</div>
-        <h3 id="totalExpenses">--</h3>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- AMOUNT SECTION -->
-<div class="row mt-4">
-
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h6>Total Donation Amount (FY)</h6>
-        <h2>₹ <span id="totalDonationAmount">--</span></h2>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h6>Total Expense Amount (FY)</h6>
-        <h2>₹ <span id="totalExpenseAmount">--</span></h2>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-</div>
-</main>
-
-<!-- FOOTER -->
-<footer class="custom-footer text-white text-center py-3 mt-auto">
-© 2026 Donor App | Powered By KREYA IT CONSULTING LTD | 9582388885 | All Rights Reserved.
-</footer>
-
+</div></main>
+<footer class="ss-foot">© 2026 Samarpan Setu | Powered By KREYA IT CONSULTING LTD | 9582388885 | All Rights Reserved.</footer>
 <script>
-// Generate Financial Years
-const fyFilter = document.getElementById("fyFilter");
-
-function generateFY() {
-  const currentYear = new Date().getFullYear();
-  for(let i=currentYear; i>=2020; i--){
-    const fy = `${i}-${i+1}`;
-    const option = document.createElement("option");
-    option.value = fy;
-    option.text = `FY ${fy}`;
-    fyFilter.appendChild(option);
-  }
-}
-
-generateFY();
-
-function loadDashboard(fy=''){
-  let url = '/dashboard-stats';
-  if(fy) url += `?fy=${fy}`;
-
-  fetch(url)
-  .then(res => res.json())
-  .then(data => {
-
-    document.getElementById("totalDonors").innerText = data.totalDonors;
-    document.getElementById("totalPrograms").innerText = data.totalPrograms;
-    document.getElementById("totalExpenses").innerText = data.totalExpenses;
-    document.getElementById("totalDonations").innerText = data.totalDonations;
-
-    document.getElementById("totalDonationAmount").innerText =
-      parseFloat(data.totalDonationAmount).toLocaleString('en-IN');
-
-    document.getElementById("totalExpenseAmount").innerText =
-      parseFloat(data.totalExpenseAmount).toLocaleString('en-IN');
-  });
-}
-
-fyFilter.addEventListener("change", function(){
-  loadDashboard(this.value);
-});
-
-loadDashboard();
+function ddToggle(e){e.preventDefault();document.getElementById('ddNav').classList.toggle('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.nr'))document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));});
 </script>
+<script>
+const fyEl=document.getElementById('fyFilter');
+(function(){const y=new Date().getFullYear();const ao=document.createElement('option');ao.value='';ao.text='All Time';fyEl.appendChild(ao);for(let i=y;i>=2020;i--){const o=document.createElement('option');o.value=`${i}-${i+1}`;o.text=`FY ${i}-${i+1}`;fyEl.appendChild(o);}})();
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+function fi(n){return parseFloat(n||0).toLocaleString('en-IN');}
+
+function loadDash(fy=''){
+  let url='/dashboard-stats';if(fy)url+=`?fy=${fy}`;
+  fetch(url).then(r=>r.json()).then(d=>{
+    document.getElementById('totalDonors').textContent=d.totalDonors;
+    document.getElementById('totalPrograms').textContent=d.totalPrograms;
+    document.getElementById('totalExpenses').textContent=d.totalExpenses;
+    document.getElementById('totalDonations').textContent=d.totalDonations;
+    document.getElementById('totalDonationAmount').textContent=fi(d.totalDonationAmount);
+    document.getElementById('totalExpenseAmount').textContent=fi(d.totalExpenseAmount);
+    document.getElementById('sDonAmt').textContent='₹'+fi(d.totalDonationAmount);
+    document.getElementById('sExpAmt').textContent='₹'+fi(d.totalExpenseAmount);
+    const net=parseFloat(d.totalDonationAmount||0)-parseFloat(d.totalExpenseAmount||0);
+    document.getElementById('netBal').textContent=fi(Math.abs(net));
+    const bc=document.getElementById('balChip');
+    bc.textContent=net>=0?'Surplus':'Deficit';
+    bc.className='chip '+(net>=0?'chip-g':'chip-r');
+    const da=parseFloat(d.totalDonationAmount||0),ea=parseFloat(d.totalExpenseAmount||0);
+    const up=da>0?Math.min(100,(ea/da*100).toFixed(1)):0;
+    document.getElementById('utilPct').textContent=up+'%';
+    document.getElementById('utilBar').style.width=up+'%';
+    const dp=Math.min(100,(parseInt(d.totalDonors||0)/50*100));
+    document.getElementById('donorPct').textContent=d.totalDonors+' donors';
+    document.getElementById('donorBar').style.width=dp+'%';
+    const tp=parseInt(d.totalPrograms||0),tn=parseInt(d.totalDonations||0);
+    const pp=tp>0&&tn>0?Math.min(100,(tp/tn*100).toFixed(1)):0;
+    document.getElementById('progPct').textContent=`${tp} programs / ${tn} donations`;
+    document.getElementById('progBar').style.width=pp+'%';
+  }).catch(()=>{});
+}
+
+fyEl.addEventListener('change',()=>loadDash(fyEl.value));
+loadDash();
+
+fetch('/donations-list?page=1').then(r=>r.json()).then(d=>{
+  const rows=d.data||[];
+  document.getElementById('recDon').innerHTML=rows.length?rows.slice(0,5).map(r=>`<tr><td>${r.first_name} ${r.last_name}</td><td>₹${parseFloat(r.donation_amount).toLocaleString('en-IN')}</td><td><span class="badge b-${(r.payment_mode||'').toLowerCase()}">${r.payment_mode||''}</span></td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;padding:1rem;color:var(--muted)">No donations yet</td></tr>';
+}).catch(()=>{});
+
+fetch('/expenses-list?page=1').then(r=>r.json()).then(d=>{
+  const rows=d.data||[];
+  document.getElementById('recExp').innerHTML=rows.length?rows.slice(0,5).map(r=>`<tr><td>${r.program_name||'-'}</td><td>₹${parseFloat(r.expense_amount).toLocaleString('en-IN')}</td><td><span class="badge b-paid">${r.status||'-'}</span></td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;padding:1rem;color:var(--muted)">No expenses yet</td></tr>';
+}).catch(()=>{});
+</script>
 </body>
 </html>
