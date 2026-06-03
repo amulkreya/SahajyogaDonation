@@ -230,6 +230,7 @@ textarea.fc{resize:vertical;min-height:70px;}
   </div>
   <div id="tv" class="card"><div class="tw"><table class="ss-tbl"><thead><tr><th>Program</th><th>Amount</th><th class="hm">Date</th><th class="hm">Status</th><th class="hm">Submitted By</th><th>Action</th></tr></thead><tbody id="et"></tbody></table></div><div class="pag" id="pg"></div></div>
   <div id="cv" class="ig" style="display:none"></div>
+  <div class="pag" id="cpg" style="display:none"></div>
 </div></main>
 <footer class="ss-foot">© 2026 Samarpan Setu | Powered By KREYA IT CONSULTING LTD | 9582388885 | All Rights Reserved.</footer>
 <script>
@@ -237,20 +238,64 @@ function ddToggle(e){e.preventDefault();document.getElementById('ddNav').classLi
 document.addEventListener('click',e=>{if(!e.target.closest('.nr'))document.querySelectorAll('.dd-menu').forEach(m=>m.classList.remove('open'));});
 </script>
 <script>
-let ed=[];
-const et=document.getElementById('et'),cv=document.getElementById('cv'),yf=document.getElementById('yf'),tv=document.getElementById('tv'),vt=document.getElementById('vt');
+let ed=[],cp=1;
+const et=document.getElementById('et'),cv=document.getElementById('cv'),yf=document.getElementById('yf'),tv=document.getElementById('tv'),vt=document.getElementById('vt'),pgEl=document.getElementById('pg'),cpgEl=document.getElementById('cpg');
+
 function fmtD(s){const d=new Date(s);return`${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;}
+
 function render(){
-  et.innerHTML=ed.map(e=>`<tr><td>${e.program_name||''}</td><td>₹${parseFloat(e.expense_amount).toLocaleString('en-IN')}</td><td class="hm">${fmtD(e.expense_date)}</td><td class="hm"><span class="badge b-paid">${e.status||''}</span></td><td class="hm">${e.submitted_by||''}</td><td><a href="/edit-expense-page?id=${e.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">No expenses found</td></tr>';
-  cv.innerHTML=ed.map(e=>`<div class="ic"><h5>${e.program_name||'-'}</h5><p><b>Amount:</b> ₹${parseFloat(e.expense_amount).toLocaleString('en-IN')}</p><p><b>Date:</b> ${fmtD(e.expense_date)}</p><p><b>Status:</b> <span class="badge b-paid">${e.status||''}</span></p><p><b>By:</b> ${e.submitted_by||''}</p><div class="cf"><a href="/edit-expense-page?id=${e.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></div></div>`).join('')||'<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No expenses found</div>';
+  et.innerHTML=ed.map(e=>`<tr>
+    <td>${e.program_name||''}</td>
+    <td>₹${parseFloat(e.expense_amount).toLocaleString('en-IN')}</td>
+    <td class="hm">${fmtD(e.expense_date)}</td>
+    <td class="hm"><span class="badge b-paid">${e.status||''}</span></td>
+    <td class="hm">${e.submitted_by||''}</td>
+    <td><a href="/edit-expense-page?id=${e.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></td>
+  </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">No expenses found</td></tr>';
+  cv.innerHTML=ed.map(e=>`<div class="ic">
+    <h5>${e.program_name||'-'}</h5>
+    <p><b>Amount:</b> ₹${parseFloat(e.expense_amount).toLocaleString('en-IN')}</p>
+    <p><b>Date:</b> ${fmtD(e.expense_date)}</p>
+    <p><b>Status:</b> <span class="badge b-paid">${e.status||''}</span></p>
+    <p><b>By:</b> ${e.submitted_by||''}</p>
+    <div class="cf"><a href="/edit-expense-page?id=${e.id}" class="btn btn-o btn-sm"><i class="fa fa-pen"></i> Edit</a></div>
+  </div>`).join('')||'<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">No expenses found</div>';
 }
-function renderPag(tp,cur){document.getElementById('pg').innerHTML=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cur?'on':''}" onclick="fetchE('${yf.value}',${i+1})">${i+1}</button>`).join('');}
-function fetchE(y='',p=1){let url=`/expenses-list?page=${p}`;if(y)url+=`&year=${y}`;fetch(url).then(r=>r.json()).then(res=>{ed=res.data;render();renderPag(res.totalPages,res.page);});}
+
+function renderPag(tp,cur){
+  const btns=Array.from({length:tp},(_,i)=>`<button class="pg ${i+1===cur?'on':''}" onclick="fetchE('${yf.value}',${i+1})">${i+1}</button>`).join('');
+  pgEl.innerHTML=btns;
+  cpgEl.innerHTML=btns;
+  cpgEl.style.display = !vt.checked ? 'flex' : 'none';
+}
+
+function fetchE(y='',p=1){
+  cp=p;
+  let url=`/expenses-list?page=${p}`;if(y)url+=`&year=${y}`;
+  fetch(url).then(r=>r.json()).then(res=>{ed=res.data;render();renderPag(res.totalPages,res.page);});
+}
+
 yf.addEventListener('change',()=>fetchE(yf.value,1));
 document.getElementById('expBtn').addEventListener('click',()=>{let y=yf.value;window.location.href='/expenses-export'+(y?`?year=${y}`:'');});
-vt.addEventListener('change',()=>{tv.style.display=vt.checked?'block':'none';cv.style.display=vt.checked?'none':'grid';});
-function setView(){if(window.innerWidth<768){vt.checked=false;tv.style.display='none';cv.style.display='grid';}else{vt.checked=true;tv.style.display='block';cv.style.display='none';}}
-window.addEventListener('resize',setView);setView();fetchE();
+
+vt.addEventListener('change',()=>{
+  tv.style.display=vt.checked?'block':'none';
+  cv.style.display=vt.checked?'none':'grid';
+  cpgEl.style.display=vt.checked?'none':'flex';
+});
+
+function setView(){
+  if(window.innerWidth<768){
+    vt.checked=false;tv.style.display='none';cv.style.display='grid';
+    cpgEl.style.display='flex';
+  } else {
+    vt.checked=true;tv.style.display='block';cv.style.display='none';
+    cpgEl.style.display='none';
+  }
+}
+window.addEventListener('resize',setView);
+setView();
+fetchE();
 </script>
 </body>
 </html>
