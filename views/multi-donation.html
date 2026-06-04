@@ -256,16 +256,7 @@ main{flex:1;padding:1.1rem;}
 </nav>
 
 <!-- ═══════════════════════ TABS ═══════════════════════ -->
-<div class="ss-tabs">
-  <ul>
-    <li><a href="/dashboard"><i class="fa fa-gauge-high"></i> Dashboard</a></li>
-    <li><a href="/donors-page"><i class="fa fa-users"></i> Donors</a></li>
-    <li><a href="/programs-page"><i class="fa fa-calendar-days"></i> Programs</a></li>
-    <li><a href="/donations-page"><i class="fa fa-hand-holding-heart"></i> Donations</a></li>
-    <li><a href="/multi-donation-page" class="on"><i class="fa fa-layer-group"></i> Multi Donation</a></li>
-    <li><a href="/expenses-page"><i class="fa fa-receipt"></i> Expenses</a></li>
-  </ul>
-</div>
+<div class="ss-tabs"><ul><li><a href="/dashboard" class=""><i class="fa fa-gauge-high"></i> Dashboard</a></li><li><a href="/donors-page" class=""><i class="fa fa-users"></i> Donors</a></li><li><a href="/programs-page" class=""><i class="fa fa-calendar-days"></i> Programs</a></li><li><a href="/donations-page" class=""><i class="fa fa-hand-holding-heart"></i> Donations</a></li><li><a href="/multi-donation-page" class="on"><i class="fa fa-layer-group"></i> Multi Donation</a></li><li><a href="/expenses-page" class=""><i class="fa fa-receipt"></i> Expenses</a></li></ul></div>
 
 <main>
 <div class="ctr">
@@ -389,10 +380,10 @@ main{flex:1;padding:1.1rem;}
       </div>
       <div class="m-fg">
         <label class="m-label">Mobile <span class="req">*</span></label>
-        <input type="tel" id="m_mob" class="m-fc" placeholder="10-digit mobile" maxlength="10" readonly
-               style="background:var(--bg);color:var(--muted)">
-        <div style="font-size:.72rem;color:var(--muted);margin-top:.25rem">
-          <i class="fa fa-lock" style="font-size:.65rem"></i> Pre-filled from your search
+        <input type="tel" id="m_mob" class="m-fc" placeholder="10-digit mobile number"
+               maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <div style="font-size:.72rem;color:var(--muted);margin-top:.25rem" id="mobHint">
+          <i class="fa fa-circle-info" style="font-size:.65rem"></i> Enter donor's 10-digit mobile number
         </div>
       </div>
       <div class="m-fg">
@@ -673,17 +664,41 @@ function clearDonor(id){
 /* ─── New Donor Modal ─── */
 function openNewDonorModal(rowIdArg){
   activeModalRow=rowIdArg;
-  // Pre-fill mobile from that row's search box
-  const mob=document.getElementById(`mob_${rowIdArg}`)?.value||'';
-  document.getElementById('m_mob').value=mob;
+
+  // Clear all fields
   document.getElementById('m_fn').value='';
   document.getElementById('m_ln').value='';
   document.getElementById('m_em').value='';
   document.getElementById('m_cy').value='';
   document.getElementById('m_st').value='';
   document.getElementById('modalErr').className='modal-err';
+
+  // Mobile: pre-fill from search box if already typed, but ALWAYS keep editable
+  const mobEl = document.getElementById('m_mob');
+  const searchedMob = document.getElementById(`mob_${rowIdArg}`)?.value||'';
+  mobEl.value = searchedMob;
+  mobEl.readOnly = false;
+  mobEl.style.background = '';
+  mobEl.style.color = '';
+
+  // Update hint based on whether mobile was pre-filled
+  const hint = document.getElementById('mobHint');
+  if(searchedMob){
+    hint.innerHTML='<i class="fa fa-circle-check" style="color:var(--green);font-size:.65rem"></i> Pre-filled from your search — you can edit if needed';
+  } else {
+    hint.innerHTML='<i class="fa fa-circle-info" style="font-size:.65rem"></i> Enter donor's 10-digit mobile number';
+  }
+
   document.getElementById('ndModal').classList.add('open');
-  setTimeout(()=>document.getElementById('m_fn').focus(),200);
+
+  // Focus: if mobile already filled go to first name, else focus mobile
+  setTimeout(()=>{
+    if(searchedMob){
+      document.getElementById('m_fn').focus();
+    } else {
+      mobEl.focus();
+    }
+  },200);
 }
 
 function closeModal(){
