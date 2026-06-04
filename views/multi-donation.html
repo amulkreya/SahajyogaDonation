@@ -447,10 +447,12 @@ async function loadPrograms(){
   errEl.style.display = 'none';
 
   try {
+    console.log('[Samarpan] Fetching programs...');
     const res = await fetch('/programs-dropdown');
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
+    console.log('[Samarpan] Programs loaded:', data.length, data);
     dd.innerHTML = '<option value="">Select Program…</option>';
     if(data.length === 0){
       dd.innerHTML = '<option value="">No programs found — add one first</option>';
@@ -464,7 +466,8 @@ async function loadPrograms(){
     }
     dd.disabled = false;
   } catch(err) {
-    console.error('Programs load failed:', err);
+    console.error('[Samarpan] Programs load FAILED:', err);
+    console.error('[Samarpan] Check: is /programs-dropdown route registered? Is session active?');
     dd.innerHTML = '<option value="">Failed to load — click Retry</option>';
     dd.disabled = false;
     errEl.style.display = 'block';
@@ -477,6 +480,7 @@ let rowId=0;
 let activeModalRow=null; // which row triggered New Donor modal
 
 function addRow(){
+  console.log('[Samarpan] addRow() called, rowId will be:', rowId+1);
   rowId++;
   const id=rowId;
   const wrap=document.getElementById('rowsWrap');
@@ -607,6 +611,7 @@ function updateTotals(){
 
 /* ─── Search Donor ─── */
 async function searchDonor(id){
+  console.log('[Samarpan] searchDonor() called for row:', id);
   const mob=document.getElementById(`mob_${id}`).value.trim();
   if(!/^[0-9]{10}$/.test(mob)){
     showToast('Enter a valid 10-digit mobile number','t-red');
@@ -715,7 +720,7 @@ function openNewDonorModal(rowIdArg){
   if(searchedMob){
     hint.innerHTML='<i class="fa fa-circle-check" style="color:var(--green);font-size:.65rem"></i> Pre-filled from your search — you can edit if needed';
   } else {
-    hint.innerHTML='<i class="fa fa-circle-info" style="font-size:.65rem"></i> Enter donor's 10-digit mobile number';
+    hint.innerHTML='<i class="fa fa-circle-info" style="font-size:.65rem"></i> Enter donor&#39;s 10-digit mobile number';
   }
 
   document.getElementById('ndModal').classList.add('open');
@@ -813,6 +818,7 @@ function validateGlobal(){
 
 /* ─── Submit All ─── */
 async function submitAll(){
+  console.log('[Samarpan] submitAll() triggered');
   if(!validateGlobal()){
     showToast('Please fill in Donation Date and Program first.','t-red');
     document.getElementById('globalDate').scrollIntoView({behavior:'smooth',block:'center'});
@@ -869,6 +875,7 @@ async function submitAll(){
   btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> Saving…';
 
   try{
+    console.log('[Samarpan] Submitting bulk:', {donation_date:globalDate, program_id:globalProgramId, count:rows.length});
     const res=await fetch('/donations/bulk',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
