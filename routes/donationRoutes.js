@@ -124,13 +124,18 @@ router.post("/donations/bulk", isAuthenticated, async (req, res) => {
         throw new Error(`Invalid donation data: donor_id=${donor_id}, amount=${amount}`);
       }
 
-      // Generate receipt number: RCP-YYYYMMDD-HHMMSS-random4
+      // Receipt format: RC-YYMMDD-HHMMSS-RR  (max 19 chars → fits VARCHAR(20))
+      // Example: RC-260604-143022-47
       const now = new Date();
       const pad = n => String(n).padStart(2, "0");
-      const datePart = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
-      const timePart = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-      const rand = Math.floor(1000 + Math.random() * 9000);
-      const receipt_number = `RCP-${datePart}-${timePart}-${rand}`;
+      const yy  = String(now.getFullYear()).slice(2);
+      const mm  = pad(now.getMonth() + 1);
+      const dd  = pad(now.getDate());
+      const hh  = pad(now.getHours());
+      const mi  = pad(now.getMinutes());
+      const ss  = pad(now.getSeconds());
+      const rr  = String(Math.floor(10 + Math.random() * 90));
+      const receipt_number = `RC-${yy}${mm}${dd}-${hh}${mi}${ss}-${rr}`;
 
       // Insert donation
       await client.query(
