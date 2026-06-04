@@ -302,8 +302,15 @@ main{flex:1;padding:1.1rem;}
         <div class="fg">
           <label class="fl">Program <span class="req">*</span></label>
           <select id="globalProgram" class="fs">
-            <option value="">Select Program…</option>
+            <option value="">Loading programs…</option>
           </select>
+          <div id="progErr" style="display:none;margin-top:.35rem;font-size:.76rem;color:var(--brand);">
+            <i class="fa fa-triangle-exclamation"></i>
+            Failed to load programs.
+            <button onclick="loadPrograms()" style="background:none;border:none;color:var(--brand);cursor:pointer;font-weight:600;text-decoration:underline;font-size:.76rem;padding:0;">
+              Retry
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -432,16 +439,38 @@ function showToast(msg,type=''){
 }
 
 /* ─── Load Programs ─── */
-fetch('/programs-dropdown')
-  .then(r=>r.json())
-  .then(data=>{
-    const dd=document.getElementById('globalProgram');
-    data.forEach(p=>{
-      const o=document.createElement('option');
-      o.value=p.id; o.text=p.program_name;
-      dd.appendChild(o);
-    });
-  }).catch(()=>{});
+async function loadPrograms(){
+  const dd = document.getElementById('globalProgram');
+  const errEl = document.getElementById('progErr');
+  dd.innerHTML = '<option value="">Loading programs…</option>';
+  dd.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    const res = await fetch('/programs-dropdown');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    dd.innerHTML = '<option value="">Select Program…</option>';
+    if(data.length === 0){
+      dd.innerHTML = '<option value="">No programs found — add one first</option>';
+    } else {
+      data.forEach(p => {
+        const o = document.createElement('option');
+        o.value = p.id;
+        o.text = p.program_name;
+        dd.appendChild(o);
+      });
+    }
+    dd.disabled = false;
+  } catch(err) {
+    console.error('Programs load failed:', err);
+    dd.innerHTML = '<option value="">Failed to load — click Retry</option>';
+    dd.disabled = false;
+    errEl.style.display = 'block';
+  }
+}
+loadPrograms();
 
 /* ─── Row management ─── */
 let rowId=0;
